@@ -43,15 +43,20 @@ data class FruitBody(
     var level: Int
 )
 
-private val fruitColors = listOf(
-    Color(0xFFFF6B6B),
-    Color(0xFFFFB84D),
-    Color(0xFFFFE66D),
-    Color(0xFF7BD389),
-    Color(0xFF5CC8FF),
-    Color(0xFFB892FF),
-    Color(0xFFFF88C2),
-    Color(0xFF72D572)
+data class FruitType(
+    val name: String,
+    val color: Color
+)
+
+private val fruitTypes = listOf(
+    FruitType("Cherry", Color(0xFFE63946)),
+    FruitType("Strawberry", Color(0xFFFF5D73)),
+    FruitType("Orange", Color(0xFFFFA62B)),
+    FruitType("Apple", Color(0xFF7CB342)),
+    FruitType("Peach", Color(0xFFFFB38A)),
+    FruitType("Pineapple", Color(0xFFF4D35E)),
+    FruitType("Dragon Fruit", Color(0xFFFF4FA3)),
+    FruitType("Jackfruit", Color(0xFFB8C94A))
 )
 
 private fun radiusFor(level: Int): Float = 24f + level * 10f
@@ -96,7 +101,7 @@ fun FruitGameScreen() {
                     val dist = sqrt(dx * dx + dy * dy).coerceAtLeast(0.001f)
                     val minDist = radiusFor(a.level) + radiusFor(b.level)
                     if (dist < minDist) {
-                        if (a.level == b.level && a.level < fruitColors.lastIndex) {
+                        if (a.level == b.level && a.level < fruitTypes.lastIndex) {
                             val level = a.level + 1
                             fruits.removeAt(j)
                             fruits.removeAt(i)
@@ -158,7 +163,8 @@ fun FruitGameScreen() {
             ) {
                 Text("FRUIT LAB", color = Color.White)
                 Text("Score $score", color = Color.White, modifier = Modifier.padding(top = 12.dp))
-                Text("Next: ${nextLevel + 1}", color = Color(0xFFCBD5E1), modifier = Modifier.padding(top = 8.dp))
+                Text("Next: ${fruitTypes[nextLevel].name}", color = Color(0xFFCBD5E1), modifier = Modifier.padding(top = 8.dp))
+                Text("Goal: Jackfruit", color = Color(0xFFB8C94A), modifier = Modifier.padding(top = 8.dp))
                 Button(
                     onClick = { fruits.clear(); score = 0 },
                     modifier = Modifier.padding(top = 18.dp)
@@ -236,12 +242,18 @@ private fun GameArena(
         )
         fruits.forEach { f ->
             val r = radiusFor(f.level)
-            drawCircle(fruitColors[f.level], r, Offset(f.x, f.y))
+            val fruit = fruitTypes[f.level]
+            drawCircle(fruit.color, r, Offset(f.x, f.y))
             drawCircle(Color.White.copy(alpha = 0.65f), r * 0.12f, Offset(f.x - r * 0.28f, f.y - r * 0.22f))
             drawCircle(Color.Black.copy(alpha = 0.45f), r * 0.06f, Offset(f.x - r * 0.18f, f.y + r * 0.02f))
             drawCircle(Color.Black.copy(alpha = 0.45f), r * 0.06f, Offset(f.x + r * 0.18f, f.y + r * 0.02f))
+            if (f.level == fruitTypes.lastIndex) {
+                drawCircle(Color(0xFF667A1F), r * 0.07f, Offset(f.x - r * 0.45f, f.y - r * 0.15f))
+                drawCircle(Color(0xFF667A1F), r * 0.07f, Offset(f.x + r * 0.38f, f.y - r * 0.32f))
+                drawCircle(Color(0xFF667A1F), r * 0.07f, Offset(f.x + r * 0.28f, f.y + r * 0.40f))
+            }
         }
         val previewR = radiusFor(nextLevel)
-        drawCircle(fruitColors[nextLevel].copy(alpha = 0.5f), previewR, Offset(size.width / 2f, previewR + 8f))
+        drawCircle(fruitTypes[nextLevel].color.copy(alpha = 0.5f), previewR, Offset(size.width / 2f, previewR + 8f))
     }
 }
