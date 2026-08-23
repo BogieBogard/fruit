@@ -3,8 +3,6 @@ name: Android APK
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -21,7 +19,10 @@ jobs:
           gradle-version: '8.9'
       - name: Build debug APK
         run: gradle :app:assembleDebug
+      - name: Prepare APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk Fruit-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: fruit-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: Fruit-Android
+          path: Fruit-debug.apk
+          retention-days: 30
