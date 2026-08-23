@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,7 +75,6 @@ fun FruitGameScreen() {
                 if (f.y + r > floor) { f.y = floor - r; f.vy *= -0.28f; f.vx *= 0.985f }
             }
 
-            var merged = false
             loop@ for (i in 0 until fruits.size) {
                 for (j in i + 1 until fruits.size) {
                     val a = fruits[i]
@@ -85,16 +85,19 @@ fun FruitGameScreen() {
                     val minDist = radiusFor(a.level) + radiusFor(b.level)
                     if (dist < minDist) {
                         if (a.level == b.level && a.level < fruitColors.lastIndex) {
-                            val nx = (a.x + b.x) / 2f
-                            val ny = (a.y + b.y) / 2f
-                            val nvx = (a.vx + b.vx) / 2f
-                            val nvy = (a.vy + b.vy) / 2f - 110f
                             val level = a.level + 1
                             fruits.removeAt(j)
                             fruits.removeAt(i)
-                            fruits.add(FruitBody(nx, ny, nvx, nvy, level))
+                            fruits.add(
+                                FruitBody(
+                                    x = (a.x + b.x) / 2f,
+                                    y = (a.y + b.y) / 2f,
+                                    vx = (a.vx + b.vx) / 2f,
+                                    vy = (a.vy + b.vy) / 2f - 110f,
+                                    level = level
+                                )
+                            )
                             score += (level + 1) * 10
-                            merged = true
                             break@loop
                         } else {
                             val overlap = minDist - dist
@@ -104,14 +107,12 @@ fun FruitGameScreen() {
                             a.y -= ny * overlap * 0.5f
                             b.x += nx * overlap * 0.5f
                             b.y += ny * overlap * 0.5f
-                            val kick = 30f
-                            a.vx -= nx * kick
-                            b.vx += nx * kick
+                            a.vx -= nx * 30f
+                            b.vx += nx * 30f
                         }
                     }
                 }
             }
-            if (merged) Unit
             delay(16)
         }
     }
