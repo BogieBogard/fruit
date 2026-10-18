@@ -76,8 +76,12 @@ export class Engine {
     const tier=Math.min(...this.bodies.map(b=>b.t));
     this.events=this.bodies.filter(b=>b.t===tier).map(b=>({x:b.x,y:b.y,t:b.t,sweep:true,points:0}));
     this.bodies=this.bodies.filter(b=>b.t!==tier);this.danger=0;
-    this._sync();return true;
+    this._sync();this._wakeAll();return true;
   }
+  _wakeAll(){
+    for(const b of this.bodies){b.sleeping=false;const rb=this._active.get(b.id);if(rb)Sleeping.set(rb,false)}
+  }
+  wake(){this._sync();this._wakeAll()}
   _sync(){
     const ids=new Set(this.bodies.map(b=>b.id));
     for(const[id,rb]of this._active)if(!ids.has(id)){Composite.remove(this.physics.world,rb);this._active.delete(id)}
@@ -116,7 +120,7 @@ export class Engine {
         else{const n=this.body(t+1,clamp(x,WALL+FRUITS[t+1].r,this.width-WALL-FRUITS[t+1].r),Math.min(y,this.floor-FRUITS[t+1].r));n.vx=(a.vx+b.vx)*.35;n.vy=Math.min(0,(a.vy+b.vy)*.35);created.push(n)}
         this.events.push({x,y,t,points,harvest,combo:this.combo});
       }
-      if(used.size){this.bodies=this.bodies.filter(b=>!used.has(b.id)).concat(created);this._sync();for(const rb of this._active.values())Sleeping.set(rb,false)}
+      if(used.size){this.bodies=this.bodies.filter(b=>!used.has(b.id)).concat(created);this._sync();this._wakeAll()}
       const overflow=this.bodies.some(b=>b.age>1.4&&b.y-FRUITS[b.t].r<LINE&&Math.abs(b.vy)<110);
       this.danger=overflow?this.danger+sub:Math.max(0,this.danger-sub*2);
       if(this.danger>=MODES[this.mode].grace){this.status='over';this.events.push({over:true});break}

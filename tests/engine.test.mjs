@@ -62,6 +62,32 @@ test('sweep clears the smallest tier only and can itself be undone',()=>{
   const e=new Engine();e.bodies=[e.body(1,60,400),e.body(4,200,400),e.body(1,340,400)];
   const before=e.serialize();assert.ok(e.sweep());assert.deepEqual(e.bodies.map(b=>b.t),[4]);assert.equal(e.score,0);assert.ok(e.undo());assert.deepEqual(e.serialize(),before);
 });
+test('sweep wakes sleeping fruit so unsupported stacks fall and settle',()=>{
+  const e=new Engine();
+  e.bodies=[e.body(0,210,FLOOR-12),e.body(5,210,FLOOR-24-43)];
+  for(const b of e.bodies){b.sleeping=true;b.age=5;b.delay=0}
+  tick(e,.1);assert.ok(e.bodies.every(b=>b.sleeping));
+  const top=e.bodies[1],beforeY=top.y;
+  assert.ok(e.sweep());assert.equal(top.sleeping,false);
+  tick(e,.25);assert.ok(top.y>beforeY+8,'Unsupported apple must fall under gravity');
+  tick(e,4);assert.ok(Math.abs(top.y+FRUITS[top.t].r-e.floor)<1,'Apple must settle onto floor');
+});
+test('successive sweeps wake the remaining pile every time and allow chain merges',()=>{
+  const e=new Engine();e.bodies=[e.body(0,60,FLOOR-12),e.body(1,360,FLOOR-16),e.body(5,210,300),e.body(5,210,450)];
+  for(const b of e.bodies){b.sleeping=true;b.age=5;b.delay=0}
+  tick(e,.1);assert.ok(e.sweep());assert.ok(e.bodies.every(b=>!b.sleeping));
+  // Reproduce another settled/suspended pile before the next sweep.
+  for(const b of e.bodies){b.sleeping=true;globalThis.Matter.Sleeping.set(e._active.get(b.id),true)}
+  assert.ok(e.sweep());assert.ok(e.bodies.every(b=>!b.sleeping));
+  tick(e,5);assert.equal(e.bodies.length,1);assert.equal(e.bodies[0].t,6);assert.equal(e.score,FRUITS[5].points);
+  assert.ok(Math.abs(e.bodies[0].y+FRUITS[6].r-e.floor)<1);
+});
+test('waking a restored suspended pile repairs previously saved floating fruit',()=>{
+  const original=new Engine();const b=original.body(7,210,300);b.sleeping=true;b.age=5;original.bodies=[b];
+  const e=Engine.restore(original.serialize());assert.equal(e.bodies[0].sleeping,true);
+  e.wake();assert.equal(e.bodies[0].sleeping,false);tick(e,.3);assert.ok(e.bodies[0].y>320);
+  tick(e,4);assert.ok(Math.abs(e.bodies[0].y+FRUITS[7].r-e.floor)<1);
+});
 test('more than three drops can be undone, including after game over',()=>{
   const e=new Engine('cozy',712);const first=e.serialize();
   for(let i=0;i<12;i++){e.setAim(50+i*20);assert.ok(e.drop());tick(e,.4)}

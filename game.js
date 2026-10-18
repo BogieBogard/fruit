@@ -1,4 +1,4 @@
-import{Engine,FRUITS,MODES,W,H,LINE,WALL}from'./engine.js?v=5';
+import{Engine,FRUITS,MODES,W,H,LINE,WALL}from'./engine.js?v=6';
 import{fruit}from'./art.js?v=5';
 const $=s=>document.querySelector(s),board=$('#board'),ctx=board.getContext('2d'),next=$('#next').getContext('2d');
 let worldHeight=H,worldWidth=W;
@@ -58,7 +58,7 @@ function overlay(type){
 function fresh(){if(engine?.status==='running')engine.status='paused';overlay('new');save()}
 function play(){
   if(!engine||!$('#mode-picker').hidden||engine.status==='over'){engine=new Engine(selected,Date.now(),worldHeight,worldWidth);particles=[];bursts=[];rings=[]}
-  engine.status='running';$('#overlay').hidden=true;last=0;acc=0;save();sync(true);board.focus({preventScroll:true});
+  engine.status='running';engine.wake();$('#overlay').hidden=true;last=0;acc=0;save();sync(true);board.focus({preventScroll:true});
 }
 function pause(){if(!engine||engine.status==='over')return;if(engine.status==='running'){engine.status='paused';overlay('paused');save()}else play()}
 function drop(){if(engine?.drop()){tone(0,true);save();sync(true)}}
