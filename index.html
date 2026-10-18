@@ -2,26 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f3e9">
-  <meta name="description" content="A little room to grow. Drop, bounce, and merge your way from cherries to jackfruit in Orchard Drop, a free browser puzzle game.">
-  <title>Orchard Drop · A little room to grow</title>
+  <meta name="theme-color" content="#202c32">
+  <meta name="description" content="Drop, bounce and merge eleven cheerful fruits. A free, touch-friendly fruit merge game with saved progress.">
+  <title>Fruit Merge · Orchard Drop</title>
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=2">
 </head>
 <body>
-<header class="site-header"><a class="wordmark" href="./" aria-label="Orchard Drop home"><span class="brand-icon">✳</span> orchard<span>drop</span><small>A LITTLE ROOM TO GROW</small></a><a class="portfolio" href="https://mbogard.com">A little game by Matt <span>↗</span></a></header>
+<header class="site-header"><a href="./" class="wordmark"><span>✿</span> FRUIT MERGE</a><a href="https://mbogard.com" class="portfolio">by Matt ↗</a></header>
 <main>
-  <aside class="intro"><div class="eyebrow"><span></span> THE SLOW-DOWN ARCADE</div><h1>Good things<br>grow <em>together.</em></h1><p>One small fruit. A little gravity.<br>A very satisfying chain reaction.</p><div class="instructions"><span class="step">01</span><div><strong>Find your spot.</strong><p>Move your mouse or slide your finger.</p></div><span class="step">02</span><div><strong>Let it drop.</strong><p>Click or release to send your fruit down.</p></div><span class="step">03</span><div><strong>Grow something bigger.</strong><p>Matching fruit merge. Reach the jackfruit.</p></div></div><div class="save-note"><span>◈</span><p>Your orchard stays here.<br><small>Progress saves in this browser.</small></p></div></aside>
-  <section class="game" aria-label="Orchard Drop game">
-    <div class="game-heading"><div><span class="eyebrow">YOUR ORCHARD</span><h2 id="mode-label">Classic</h2></div><div class="tools"><button id="sound" class="icon-button" aria-label="Turn sound on" aria-pressed="false" title="Sound">♪<span class="off-slash">/</span></button><button id="pause" class="icon-button" aria-label="Pause game" title="Pause (P)">Ⅱ</button></div></div>
-    <div class="scoreboard"><div><span>SCORE</span><strong id="score">0</strong></div><div class="best"><span>PERSONAL BEST <span class="star">✧</span></span><strong id="best">0</strong></div><div class="next"><span>NEXT UP</span><canvas id="next" width="100" height="100" aria-label="Next fruit"></canvas></div></div>
-    <div class="board-wrap"><canvas id="board" width="420" height="620" tabindex="0" aria-label="Fruit game board. Use left and right arrows to aim, space to drop, and P to pause."></canvas><div class="board-caption"><span id="board-hint">KEEP IT BELOW THE LINE</span><span id="time">0:00</span></div><div id="overlay" class="overlay"><div class="overlay-content"><div class="seed-mark">✳</div><span class="eyebrow" id="overlay-kicker">A FRESH LITTLE START</span><h2 id="overlay-title">Make room<br>for good things.</h2><p id="overlay-text">Drop fruit. Find a match.<br>See how far your orchard can grow.</p><div id="mode-picker" class="mode-picker" aria-label="Difficulty"><button data-mode="cozy">Cozy</button><button data-mode="classic" class="selected">Classic</button><button data-mode="spicy">Spicy</button></div><p id="mode-description" class="mode-description">A balanced bounce. The sweet spot.</p><button id="play" class="primary">Plant the first seed <span>↗</span></button><button id="restart" class="text-button" hidden>Start a fresh orchard</button></div></div></div>
-    <div class="game-footer"><span><i class="status-dot"></i> <span id="save-status">Saved on this device</span></span><button id="new-game">New orchard ↻</button></div>
-    <p class="mobile-guide">Slide to aim · Release to drop · Match two to grow</p>
+  <section class="game" aria-label="Fruit Merge game">
+    <div class="scoreboard">
+      <button id="pause" class="round-button" aria-label="Pause game" title="Pause (P)">Ⅱ</button>
+      <div class="score-card"><span id="mode-label">CLASSIC</span><strong id="score">0</strong></div>
+      <div class="score-card best"><span>ALL TIME <span class="crown">♛</span></span><strong id="best">0</strong></div>
+      <button id="new-game" class="round-button" aria-label="New game" title="Restart">↻</button>
+    </div>
+    <div class="power-bar">
+      <div class="powers"><button id="sweep" class="power-button" aria-label="Sweep smallest fruit" title="Sweep: remove the smallest fruit type"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 3L12 20M11 15l9 5-8 10-10-6zM6 22l8 4M5 26l5 2"/></svg><span id="sweep-count" class="charge">2</span></button><button id="undo" class="power-button" aria-label="Undo last drop" title="Undo last drop (U)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 5L3 13l9 8M4 13h13q12 0 12 13"/></svg><span id="undo-count" class="charge">3</span></button></div>
+      <div class="next-box"><span>NEXT</span><canvas id="next" width="240" height="85" aria-label="Next three fruit"></canvas></div>
+    </div>
+    <div class="board-wrap">
+      <canvas id="board" width="420" height="580" tabindex="0" aria-label="Fruit game board. Arrow keys aim. Space drops. P pauses. U undoes."></canvas>
+      <div class="board-caption"><span id="board-hint"></span><span id="time">0:00</span></div>
+      <div id="overlay" class="overlay"><div class="overlay-content"><div class="hero-fruits"><canvas id="hero" width="620" height="210" aria-hidden="true"></canvas></div><span class="eyebrow" id="overlay-kicker">DROP · MATCH · MERGE</span><h1 id="overlay-title">FRUIT<br><span>MERGE!</span></h1><p id="overlay-text">Match two of a kind.<br>Make bigger fruit. Keep below the line!</p><div id="mode-picker" class="mode-picker" aria-label="Difficulty"><button data-mode="cozy">EASY</button><button data-mode="classic" class="selected">CLASSIC</button><button data-mode="spicy">HARD</button></div><p id="mode-description" class="mode-description">The classic drop-and-merge challenge.</p><button id="play" class="primary">LET’S PLAY <span>▶</span></button><button id="restart" class="text-button" hidden>START A NEW GAME</button></div></div>
+    </div>
+    <div id="evolution" class="evolution" aria-label="Fruit evolution order"></div>
+    <div class="game-footer"><button id="help-button" aria-label="How to play">?</button><span id="save-status">● AUTO-SAVED</span><button id="sound" aria-label="Turn sound on" aria-pressed="false" title="Sound (M)">♪<span class="off-slash">/</span></button></div>
   </section>
-  <aside class="field-notes"><span class="eyebrow">FROM SMALL BEGINNINGS</span><h2>The fruit family.</h2><p>A match makes the next one.<br>There’s always room to grow.</p><div id="ladder" class="ladder"></div><div class="tip"><span>FIELD NOTE NO. 01</span><p>Leave a little room on either side. A good bounce can change everything.</p></div><div class="keyboard">← → aim <span>SPACE drop</span><br>P pause <span>M sound</span></div></aside>
+  <aside class="guide"><span class="tag">THE BIGGER, THE BETTER</span><h2>ONE MORE<br><span>MERGE.</span></h2><p>A little bounce. A perfect match.<br>And suddenly, a much bigger fruit.</p><div class="guide-card"><h3>THE RULES ARE SIMPLE</h3><p><b>01</b> Move to aim. Release to drop.</p><p><b>02</b> Two matching fruit become one.</p><p><b>03</b> Don’t cross the danger line.</p></div><div class="guide-card"><h3>MEET THE WHOLE BUNCH</h3><div id="ladder" class="ladder"></div></div><p class="controls">← → AIM &nbsp; SPACE DROP<br>P PAUSE &nbsp; U UNDO &nbsp; M SOUND</p><p class="privacy">Your game saves in this browser.<br>No ads. No account. Just fruit.</p></aside>
 </main>
-<footer class="site-footer"><span>NO RUSH. JUST FRUIT.</span><span>Made for the joy of a good little game. <span class="flower">✳</span></span></footer>
+<dialog id="help"><button id="close-help" class="close" aria-label="Close instructions">×</button><h2>HOW TO PLAY</h2><p>Slide your finger or move your mouse to aim. Release or click to drop.</p><p>Matching fruit merge into the next fruit in the row. Keep the pile below the dotted line. Two jackfruits make a harvest worth 1,000 bonus points!</p><p><b>↶ Undo</b> rewinds your last drop (3 per game).<br><b>✦ Sweep</b> clears the smallest fruit type (2 per game).</p><p>Your board and best scores save automatically in this browser. Come back anytime to continue.</p><button id="help-ok" class="primary">GOT IT!</button></dialog>
 <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
-<script type="module" src="./game.js"></script>
+<script type="module" src="./game.js?v=2"></script>
 </body></html>

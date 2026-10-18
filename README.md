@@ -1,6 +1,6 @@
 # Orchard Drop
 
-A quiet little fruit-merging game for the browser. Move to aim, click or release to drop, and merge matching fruit from cherry all the way to jackfruit. Merge two jackfruits to harvest the pair and earn a 1,000-point bonus.
+A bright, arcade-style fruit-merging game for the browser. Move to aim, click or release to drop, and merge matching fruit through eleven stages from blueberry to jackfruit. Merge two jackfruits to harvest the pair and earn a 1,000-point bonus.
 
 Intended Pages URL: **https://mbogard.com/fruit/**
 
@@ -18,15 +18,18 @@ Open http://127.0.0.1:4173/fruit/. Run `npm test` for physics, scoring, save/res
 
 - Mouse: move to aim, click to drop. Touch: slide to aim, release to drop.
 - Keyboard: left/right arrows to aim, Space to drop, P/Escape to pause, M to toggle sound.
-- Cozy, Classic, and Spicy modes with separate personal bests.
+- Easy, Classic, and Hard modes with separate personal bests.
+- Eleven fruits with full circular artwork matching their collision surfaces; real rolling, friction, bounce, stable stacking, and sleeping resting bodies.
+- Three-fruit upcoming preview, evolution strip, merge particles, score bursts, and chain-merge feedback.
+- Undo the last drop (3 charges per game) or sweep the smallest fruit type (2 charges).
 - Automatic saves, pause when the tab is hidden, and explicit resume when returning.
 - Optional synthesized sound; muted by default. Respects reduced-motion preferences.
 - Responsive phone, tablet, and desktop layouts; high-density canvas rendering.
-- No accounts, ads, analytics, cookies, backend, or runtime JavaScript dependencies.
+- No accounts, ads, analytics, cookies, backend, or external runtime requests. Matter.js is vendored locally with its MIT license.
 
 ## Browser saves
 
-The versioned `mbogard.fruit.orchard.v1` localStorage entry holds the current board, fruit velocities, upcoming fruit, random generator state, score, elapsed time, mode, and settings. Runs save after drops, on pause/tab exit, and about once a second during play. Returning opens the saved run paused. Saves are local to the browser/profile and origin; they do not sync across devices. Clearing site data removes them. Private browsing or blocked storage can prevent persistent saving; gameplay still works.
+The versioned `mbogard.fruit.orchard.v1` localStorage entry holds the current board, fruit velocities and rotation, upcoming queue, random generator state, score, elapsed time, mode, remaining power-up charges, and settings. Its payload is now version 2; original eight-fruit saves migrate automatically, preserving the board and score. Runs save after drops, on pause/tab exit, and about once a second during play. Returning opens the saved run paused. Undo history is session-only; unused charges persist. Saves are local to the browser/profile and origin; they do not sync across devices. Clearing site data removes them. Private browsing or blocked storage can prevent persistent saving; gameplay still works.
 
 ## GitHub Pages
 
@@ -36,11 +39,12 @@ Private-repository Pages requires an eligible existing GitHub plan. The game doe
 
 ## Source
 
-- `engine.js`: deterministic fixed-step circle simulation, collisions, merging, scoring, save validation.
+- `engine.js`: fixed-step Matter.js rigid-body simulation, contact merges, scoring, power-ups, save validation and migration.
 - `art.js`: original canvas fruit illustrations.
 - `game.js`: input, rendering, sound, UI, and persistence.
-- `style.css` / `index.html`: responsive interface. Google Fonts enhance typography with system fallbacks when unavailable.
-- `tests/engine.test.mjs`: dependency-free automated tests.
+- `style.css` / `index.html`: compact, dark arcade interface with system fonts and responsive phone layouts.
+- `vendor/matter.js`: Matter.js 0.20.0, MIT licensed. The UMD root is changed from `this` to `globalThis` to support native browser/Node ES modules. See `vendor/LICENSE-Matter.txt` and https://www.brm.io/matter-js/.
+- `tests/engine.test.mjs`: merge, contact support, floor gap, rolling, power-up, migration, and crowded-pile tests.
 - `scripts/browser-check.mjs`: optional Playwright integration checks; install Playwright separately or set `PLAYWRIGHT_MODULE` to an existing module path.
 
 The earlier Android code remains in `app/` as an archive. Its workflow is manual-only; the website does not use Android tooling. CI checks the web engine on pushes and pull requests.
