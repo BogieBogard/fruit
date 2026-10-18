@@ -1,0 +1,103 @@
+/* Use the viewport as a game surface, including foldables and browser chrome changes.
+   The renderer follows this box in world units; fruit are never stretched. */
+body { min-height: 100dvh; }
+.site-header {
+  height: 48px;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+body main {
+  margin: 0 auto;
+  padding: 0 max(12px, env(safe-area-inset-left, 0px)) 8px;
+  max-width: 1120px;
+  gap: 48px;
+}
+body main .game {
+  display: grid;
+  grid-template-rows: 72px 70px minmax(0, 1fr) 60px 42px;
+  width: min(520px, 100%);
+  min-width: 0;
+  height: calc(100dvh - 56px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: 1100px;
+}
+.scoreboard { padding: 0 0 12px; }
+.power-bar { min-height: 0; padding: 0 8px 10px; }
+.board-wrap { min-height: 0; min-width: 0; container-type: size; }
+#board { width: 100%; height: 100%; aspect-ratio: auto; }
+.next-box canvas { object-fit: contain; }
+.board-caption { top: var(--caption-top, 18%); }
+.evolution { height: auto; margin: 9px 10px 2px; }
+.evolution canvas { width: min(8.7%, 39px); }
+.game-footer { margin: 5px 12px 0; }
+.overlay { padding: 12px 16px; }
+.hero-fruits { height: clamp(24px, 13cqh, 78px); margin: 0 auto; }
+.overlay h1 { font-size: clamp(26px, 10cqh, 49px); margin: 7px 0 10px; }
+.overlay p { font-size: clamp(10px, 2.7cqh, 13px); margin: 6px 0 10px; }
+.overlay .eyebrow { font-size: clamp(7px, 1.7cqh, 9px); }
+.mode-picker { margin-top: 10px; }
+.mode-picker button { padding: 8px 5px; }
+.overlay .mode-description { font-size: 9px; margin: 6px 0 12px; min-height: 12px; }
+.overlay .primary { padding: 12px; font-size: 21px; }
+.text-button { margin-top: 14px; }
+.guide { padding-top: 24px; }
+@media (max-width: 1100px), (pointer: coarse) {
+  .guide { display: none; }
+  .site-header { max-width: 720px; height: 40px; padding-left: 16px; padding-right: 16px; }
+  body main { max-width: 720px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  body main .game {
+    width: 100%;
+    grid-template-rows: 62px 60px minmax(0, 1fr) 50px 38px;
+    height: calc(100dvh - 48px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+  .scoreboard { grid-template-columns: 44px 1fr 1fr 44px; padding-bottom: 10px; }
+  .round-button { width: 42px; height: 42px; }
+  .score-card { padding: 5px 4px; }
+  .score-card strong { font-size: 27px; }
+  .score-card > span { font-size: 10px; }
+  .power-button { width: 44px; height: 44px; }
+  .power-bar { padding-bottom: 8px; }
+  .next-box { width: clamp(140px, 30vw, 190px); height: 48px; }
+  .evolution { margin-left: 6px; margin-right: 6px; }
+}
+@media (max-height: 720px) {
+  .site-header { height: 32px; }
+  body main .game {
+    grid-template-rows: 54px 50px minmax(0, 1fr) 42px 34px;
+    height: calc(100dvh - 40px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+  .score-card strong { font-size: 23px; }
+  .power-button { width: 38px; height: 38px; }
+  .power-button svg { width: 27px; height: 27px; }
+  .next-box { height: 40px; }
+  .evolution { margin-top: 6px; }
+  .evolution canvas { width: min(8.7%, 31px); }
+  .game-footer { margin-top: 3px; }
+}
+@container (max-height: 370px) {
+  .hero-fruits { display: none; }
+  .overlay h1 { font-size: 29px; margin: 6px 0; }
+  .overlay .eyebrow { font-size: 8px; }
+  .overlay p { font-size: 10px; margin: 6px 0; }
+  .overlay .mode-description { margin: 5px 0 9px; }
+  .mode-picker { margin-top: 8px; }
+  .mode-picker button { padding: 7px 4px; }
+  .overlay .primary { padding: 10px; font-size: 18px; }
+}
+@media (min-aspect-ratio: 6/5) and (max-height: 650px) {
+  body main { max-width: 1000px; }
+  body main .game {
+    grid-template-columns: 170px minmax(0, 1fr);
+    grid-template-rows: 110px 116px minmax(0, 1fr) 36px;
+    column-gap: 16px;
+  }
+  .board-wrap { grid-column: 2; grid-row: 1 / -1; }
+  .scoreboard { grid-column: 1; grid-row: 1; grid-template-columns: 40px 1fr; gap: 8px; align-content: start; }
+  .score-card { min-height: 45px; }
+  .scoreboard .best { grid-column: 2; }
+  #new-game { grid-column: 1; grid-row: 2; }
+  .power-bar { grid-column: 1; grid-row: 2; flex-direction: column; justify-content: flex-start; gap: 12px; padding-top: 12px; }
+  .next-box { width: 150px; }
+  .evolution { grid-column: 1; grid-row: 3; align-self: end; flex-wrap: wrap; height: 80px; padding: 6px; border-radius: 16px; margin: 0 0 6px; }
+  .evolution canvas { width: 25px; }
+  .game-footer { grid-column: 1; grid-row: 4; margin: 0; }
+  #save-status { font-size: 6px; letter-spacing: 0; }
+}

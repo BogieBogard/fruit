@@ -90,3 +90,12 @@ test('crowded long runs remain finite in all modes',()=>{
     for(const b of e.bodies)for(const k of['x','y','vx','vy','angle'])assert.ok(Number.isFinite(b[k]));assert.ok(e.score>0);
   }
 });
+test('resizing keeps a settled pile bottom-anchored without scaling fruit',()=>{
+  const e=new Engine();e.bodies=[e.body(4,130,FLOOR-FRUITS[4].r),e.body(5,230,FLOOR-FRUITS[5].r)];tick(e,3);
+  const before=e.bodies.map(b=>({...b}));e.resizeBoard(400,520);
+  for(let i=0;i<before.length;i++){assert.ok(Math.abs(e.floor-e.bodies[i].y-(FLOOR-before[i].y))<.001);assert.ok(Math.abs(e.bodies[i].x-before[i].x-50)<.001);assert.equal(e.bodies[i].t,before[i].t)}
+  assert.equal(Engine.restore(e.serialize()).floor,388);tick(e,2);assert.ok(e.bodies.every(b=>b.y+FRUITS[b.t].r<=e.floor+1));
+});
+test('undo after rotation keeps current board dimensions',()=>{
+  const e=new Engine();e.drop();tick(e,.5);e.resizeBoard(400,550);assert.ok(e.undo());assert.equal(e.height,400);assert.equal(e.width,550);assert.equal(e.bodies.length,0);
+});

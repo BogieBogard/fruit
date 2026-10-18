@@ -24,7 +24,7 @@ Open http://127.0.0.1:4173/fruit/. Run `npm test` for physics, scoring, save/res
 - Unlimited undo through drops and sweeps in the current session, including recovery after game over. Unlimited sweeps of the smallest fruit type.
 - Automatic saves, pause when the tab is hidden, and explicit resume when returning.
 - Optional synthesized sound; muted by default. Respects reduced-motion preferences.
-- Responsive phone, tablet, and desktop layouts; high-density canvas rendering.
+- Viewport-filling phone, Fold cover/unfolded, tablet, and desktop layouts; compact side controls in landscape. Browser toolbar changes use dynamic viewport sizing. Canvas resolution tracks its actual displayed size and screen density; fruit remain circular.
 - No accounts, ads, analytics, cookies, backend, or external runtime requests. Matter.js is vendored locally with its MIT license.
 
 ## Browser saves
@@ -42,9 +42,10 @@ Private-repository Pages requires an eligible existing GitHub plan. The game doe
 - `engine.js`: fixed-step Matter.js rigid-body simulation, contact merges, scoring, power-ups, save validation and migration.
 - `art.js`: original canvas fruit illustrations.
 - `game.js`: input, rendering, sound, UI, and persistence.
-- `style.css` / `index.html`: compact, dark arcade interface with system fonts and responsive phone layouts.
+- `style.css` / `layout.css` / `index.html`: compact, dark arcade interface with system fonts, dynamic viewport grids, safe-area spacing, and foldable/landscape layouts. Board dimensions adapt while preserving fruit size/shape, supporting contacts, and the saved pile. Crowded piles retain enough logical height to stay visible during a fold or rotation.
 - `vendor/matter.js`: Matter.js 0.20.0, MIT licensed. The UMD root is changed from `this` to `globalThis` to support native browser/Node ES modules. See `vendor/LICENSE-Matter.txt` and https://www.brm.io/matter-js/.
 - `tests/engine.test.mjs`: merge, contact support, floor gap, rolling, power-up, migration, and crowded-pile tests.
 - `scripts/browser-check.mjs`: optional Playwright integration checks; install Playwright separately or set `PLAYWRIGHT_MODULE` to an existing module path.
+- `scripts/layout-check.mjs`: nine phone/foldable/tablet/landscape viewports, sharp round rendering, controls/menu visibility, overlap checks, and fold/rotate state preservation.
 
 The earlier Android code remains in `app/` as an archive. Its workflow is manual-only; the website does not use Android tooling. CI checks the web engine on pushes and pull requests.

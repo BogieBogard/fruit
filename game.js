@@ -1,7 +1,18 @@
-import{Engine,FRUITS,MODES,W,H,LINE,FLOOR,WALL}from'./engine.js?v=3';
+import{Engine,FRUITS,MODES,W,H,LINE,WALL}from'./engine.js?v=4';
 import{fruit}from'./art.js?v=3';
 const $=s=>document.querySelector(s),board=$('#board'),ctx=board.getContext('2d'),next=$('#next').getContext('2d');
-const ratio=Math.min(devicePixelRatio||1,2);board.width=W*ratio;board.height=H*ratio;ctx.scale(ratio,ratio);
+let worldHeight=H,worldWidth=W;
+function fitBoard(){
+  const box=board.getBoundingClientRect();if(!box.width||!box.height)return;
+  const settled=engine?.bodies.filter(b=>b.age>1.4)??[];
+  const pileHeight=settled.length?Math.max(...settled.map(b=>engine.floor-b.y+FRUITS[b.t].r))+LINE+16:360;
+  worldHeight=Math.max(360,pileHeight,W*box.height/box.width);worldWidth=worldHeight*box.width/box.height;
+  const density=Math.min(devicePixelRatio||1,3),pixelWidth=Math.round(box.width*density),pixelHeight=Math.round(box.height*density);
+  if(board.width!==pixelWidth||board.height!==pixelHeight){board.width=pixelWidth;board.height=pixelHeight}
+  ctx.setTransform(pixelWidth/worldWidth,0,0,pixelHeight/worldHeight,0,0);
+  $('.board-wrap').style.setProperty('--caption-top',`${(LINE+18)/worldHeight*100}%`);
+  if(engine&&(engine.height!==worldHeight||engine.width!==worldWidth)){engine.resizeBoard(worldHeight,worldWidth);save()}
+}
 const KEY='mbogard.fruit.orchard.v1';
 let engine=null,selected='classic',particles=[],bursts=[],rings=[],last=0,acc=0,lastSave=0,sound=false,audio=null;
 let settings={best:{},sound:false},storage=true,uiStamp='',returnFromHelp=false;
@@ -46,7 +57,7 @@ function overlay(type){
 }
 function fresh(){if(engine?.status==='running')engine.status='paused';overlay('new');save()}
 function play(){
-  if(!engine||!$('#mode-picker').hidden||engine.status==='over'){engine=new Engine(selected);particles=[];bursts=[];rings=[]}
+  if(!engine||!$('#mode-picker').hidden||engine.status==='over'){engine=new Engine(selected,Date.now(),worldHeight,worldWidth);particles=[];bursts=[];rings=[]}
   engine.status='running';$('#overlay').hidden=true;last=0;acc=0;save();sync(true);board.focus({preventScroll:true});
 }
 function pause(){if(!engine||engine.status==='over')return;if(engine.status==='running'){engine.status='paused';overlay('paused');save()}else play()}
@@ -60,7 +71,7 @@ $('#new-game').onclick=()=>{if(engine&&engine.status!=='over'&&engine.bodies.len
 $('#help-button').onclick=()=>{returnFromHelp=engine?.status==='running';if(returnFromHelp){engine.status='paused';save()}$('#help').showModal();sync(true)};
 function closeHelp(){$('#help').close();if(returnFromHelp&&engine){engine.status='running';last=0}returnFromHelp=false;sync(true)}
 $('#close-help').onclick=closeHelp;$('#help-ok').onclick=closeHelp;$('#help').addEventListener('cancel',e=>{e.preventDefault();closeHelp()});
-function aim(e){if(!engine)return;const box=board.getBoundingClientRect();engine.setAim((e.clientX-box.left)/box.width*W)}
+function aim(e){if(!engine)return;const box=board.getBoundingClientRect();engine.setAim((e.clientX-box.left)/box.width*worldWidth)}
 board.addEventListener('pointermove',aim);
 board.addEventListener('pointerdown',e=>{if(engine?.status!=='running')return;board.setPointerCapture(e.pointerId);aim(e);e.preventDefault()});
 board.addEventListener('pointerup',e=>{if(!board.hasPointerCapture(e.pointerId))return;aim(e);drop();board.releasePointerCapture(e.pointerId)});
@@ -79,6 +90,7 @@ function effects(e){
   announce(e.harvest?'Jackfruit harvest! A thousand bonus points.':e.sweep?'Fruit swept away.':`${FRUITS[e.t].name} merged. ${engine.score} points.`);
 }
 function render(dt){
+  const W=worldWidth,H=worldHeight,FLOOR=engine?.floor??H-12;
   ctx.clearRect(0,0,W,H);ctx.save();
   // The rim, danger line, and physical walls share the same coordinates.
   const bg=ctx.createLinearGradient(0,LINE,0,H);bg.addColorStop(0,'#142028');bg.addColorStop(1,'#101b23');ctx.fillStyle=bg;ctx.fillRect(WALL,LINE-11,W-WALL*2,FLOOR-LINE+11);
@@ -108,4 +120,4 @@ for(let t=0;t<FRUITS.length;t++){
   const row=document.createElement('div');row.className='fruit-row';const copy=c.cloneNode();fruit(copy.getContext('2d'),t,50,55,34);const label=document.createElement('span');label.textContent=FRUITS[t].name;row.append(copy,label);$('#ladder').append(row);
 }
 const hero=$('#hero').getContext('2d');fruit(hero,4,155,132,65,-.2);fruit(hero,9,310,115,88,.08);fruit(hero,5,466,132,65,.2);
-soundUI();overlay(engine?(engine.status==='over'?'over':'paused'):'new');if(!storage)$('#save-status').textContent='SAVING UNAVAILABLE';sync(true);requestAnimationFrame(frame);
+soundUI();overlay(engine?(engine.status==='over'?'over':'paused'):'new');if(!storage)$('#save-status').textContent='SAVING UNAVAILABLE';sync(true);fitBoard();new ResizeObserver(fitBoard).observe($('.board-wrap'));window.visualViewport?.addEventListener('resize',fitBoard);window.addEventListener('resize',fitBoard);requestAnimationFrame(frame);

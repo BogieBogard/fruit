@@ -24,26 +24,38 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const STEP=1/120;
 
 export class Engine {
-  constructor(mode='classic',seed=Date.now()) {
+  constructor(mode='classic',seed=Date.now(),height=H,width=W) {
     this.mode=Object.hasOwn(MODES,mode)?mode:'classic';
     this.rng=seed>>>0||1;this.serial=1;this.bodies=[];this.score=0;
     this.elapsed=0;this.cooldown=0;this.danger=0;this.status='running';
     this.current=this.randomFruit();this.queue=[this.randomFruit(),this.randomFruit(),this.randomFruit()];
     this.aim=W/2;this.harvests=0;this.combo=0;this.lastMerge=-10;
+    this.height=clamp(height,360,2000);this.width=clamp(width,W,2000);this.floor=this.height-12;
+    this.aim=this.width/2;
     this.events=[];this.history=[];this._active=new Map();
     this.physics=Physics.create({enableSleeping:true,positionIterations:12,velocityIterations:10});
     this.physics.gravity.y=1;this.physics.gravity.scale=MODES[this.mode].gravity/1000000;
     const options={isStatic:true,friction:.28,restitution:.08,slop:.01};
+    this._floorBody=Bodies.rectangle(1000,this.floor+40,2400,80,options);
+    this._rightWall=Bodies.rectangle(this.width-WALL+40,500,80,5000,options);
     Composite.add(this.physics.world,[
-      Bodies.rectangle(W/2,FLOOR+40,W+200,80,options),
-      Bodies.rectangle(WALL-40,H/2,80,H+1000,options),
-      Bodies.rectangle(W-WALL+40,H/2,80,H+1000,options),
+      this._floorBody,
+      Bodies.rectangle(WALL-40,500,80,5000,options),
+      this._rightWall,
     ]);
   }
   get next(){return this.queue[0]}
+  resizeBoard(height,width=this.width){
+    height=clamp(height,360,2000);width=clamp(width,W,2000);if(height===this.height&&width===this.width)return;
+    const delta=height-this.height,dx=(width-this.width)/2;this.height=height;this.width=width;this.floor=height-12;
+    Body.setPosition(this._floorBody,{x:1000,y:this.floor+40});Body.setPosition(this._rightWall,{x:this.width-WALL+40,y:500});
+    for(const b of this.bodies){b.y+=delta;b.x=clamp(b.x+dx,WALL+FRUITS[b.t].r,this.width-WALL-FRUITS[b.t].r);const rb=this._active.get(b.id);if(rb)Body.setPosition(rb,{x:b.x,y:b.y})}
+    this.setAim(this.aim+dx);
+    this.danger=0;
+  }
   random(){let x=this.rng;x^=x<<13;x^=x>>>17;x^=x<<5;this.rng=x>>>0;return this.rng/4294967296}
   randomFruit(){return Math.floor(this.random()*(MODES[this.mode].max+1))}
-  setAim(x){const r=FRUITS[this.current].r;this.aim=clamp(x,WALL+r,W-WALL-r)}
+  setAim(x){const r=FRUITS[this.current].r;this.aim=clamp(x,WALL+r,this.width-WALL-r)}
   body(t,x,y){return{id:this.serial++,t,x,y,vx:0,vy:0,angle:0,omega:0,age:0,delay:.13,sleeping:false}}
   drop(){
     if(this.status!=='running'||this.cooldown>0||this.bodies.length>=150)return false;
@@ -55,7 +67,7 @@ export class Engine {
   undo(){
     if(!this.history.length)return false;
     const history=this.history.slice(0,-1),state=this.history.at(-1);
-    const restored=Engine.restore(state);restored.history=history;
+    const restored=Engine.restore(state);restored.resizeBoard(this.height,this.width);restored.history=history;
     restored.status='running';Object.assign(this,restored);return true;
   }
   sweep(){
@@ -101,7 +113,7 @@ export class Engine {
         this.combo=this.elapsed-this.lastMerge<1.25?this.combo+1:1;this.lastMerge=this.elapsed;
         const points=FRUITS[t].points+(harvest?1000:0);this.score+=points;
         if(harvest)this.harvests++;
-        else{const n=this.body(t+1,clamp(x,WALL+FRUITS[t+1].r,W-WALL-FRUITS[t+1].r),Math.min(y,FLOOR-FRUITS[t+1].r));n.vx=(a.vx+b.vx)*.35;n.vy=Math.min(0,(a.vy+b.vy)*.35);created.push(n)}
+        else{const n=this.body(t+1,clamp(x,WALL+FRUITS[t+1].r,this.width-WALL-FRUITS[t+1].r),Math.min(y,this.floor-FRUITS[t+1].r));n.vx=(a.vx+b.vx)*.35;n.vy=Math.min(0,(a.vy+b.vy)*.35);created.push(n)}
         this.events.push({x,y,t,points,harvest,combo:this.combo});
       }
       if(used.size){this.bodies=this.bodies.filter(b=>!used.has(b.id)).concat(created);this._sync();for(const rb of this._active.values())Sleeping.set(rb,false)}
@@ -111,13 +123,15 @@ export class Engine {
     }
   }
   serialize(){
-    const keys=['mode','rng','serial','score','elapsed','cooldown','danger','status','current','aim','harvests','combo','lastMerge'];
+    const keys=['mode','rng','serial','score','elapsed','cooldown','danger','status','current','aim','harvests','combo','lastMerge','height','width'];
     const state={version:2,bodies:this.bodies.map(b=>({...b})),queue:[...this.queue]};
     for(const k of keys)state[k]=this[k];return state;
   }
   static restore(input){
     if(!input||![1,2].includes(input.version))throw Error('Incompatible save');
     const data=structuredClone(input);
+    data.height=Number.isFinite(data.height)?clamp(data.height,360,2000):H;
+    data.width=Number.isFinite(data.width)?clamp(data.width,W,2000):W;
     if(data.version===1){
       const tiers=[1,2,4,5,6,7,8,10];
       data.current=tiers[data.current];data.queue=[tiers[data.next],0,1];
@@ -130,7 +144,7 @@ export class Engine {
     if(data.score<0||data.elapsed<0||!validTier(data.current)||!Array.isArray(data.queue)||data.queue.length!==3||!data.queue.every(validTier))throw Error('Invalid values');
     const ids=new Set();
     for(const b of data.bodies){if(!validTier(b.t)||!['id','x','y','vx','vy','angle','age','delay'].every(k=>Number.isFinite(b[k]))||Math.abs(b.x)>2000||Math.abs(b.y)>5000||ids.has(b.id))throw Error('Invalid fruit');ids.add(b.id);b.omega=Number.isFinite(b.omega)?b.omega:0}
-    const e=new Engine(data.mode);for(const k of Object.keys(e.serialize()))if(k!=='version')e[k]=structuredClone(data[k]);
+    const e=new Engine(data.mode,1,data.height,data.width);for(const k of Object.keys(e.serialize()))if(k!=='version')e[k]=structuredClone(data[k]);
     e.setAim(e.aim);e._sync();return e;
   }
 }
