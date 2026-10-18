@@ -29,7 +29,7 @@ export class Engine {
     this.rng=seed>>>0||1;this.serial=1;this.bodies=[];this.score=0;
     this.elapsed=0;this.cooldown=0;this.danger=0;this.status='running';
     this.current=this.randomFruit();this.queue=[this.randomFruit(),this.randomFruit(),this.randomFruit()];
-    this.aim=W/2;this.harvests=0;this.combo=0;this.lastMerge=-10;this.undos=3;this.sweeps=2;
+    this.aim=W/2;this.harvests=0;this.combo=0;this.lastMerge=-10;
     this.events=[];this.history=[];this._active=new Map();
     this.physics=Physics.create({enableSleeping:true,positionIterations:12,velocityIterations:10});
     this.physics.gravity.y=1;this.physics.gravity.scale=MODES[this.mode].gravity/1000000;
@@ -47,23 +47,24 @@ export class Engine {
   body(t,x,y){return{id:this.serial++,t,x,y,vx:0,vy:0,angle:0,omega:0,age:0,delay:.13,sleeping:false}}
   drop(){
     if(this.status!=='running'||this.cooldown>0||this.bodies.length>=150)return false;
-    this.history.push(this.serialize());if(this.history.length>3)this.history.shift();
+    this.history.push(this.serialize());
     this.setAim(this.aim);const b=this.body(this.current,this.aim,39);b.vy=25;
     this.bodies.push(b);this.current=this.queue.shift();this.queue.push(this.randomFruit());
     this.cooldown=.32;this.setAim(this.aim);return true;
   }
   undo(){
-    if(!this.history.length||this.undos<=0)return false;
-    const remaining=this.undos-1,history=this.history.slice(0,-1),state=this.history.at(-1);
-    const restored=Engine.restore(state);restored.undos=remaining;restored.history=history;
+    if(!this.history.length)return false;
+    const history=this.history.slice(0,-1),state=this.history.at(-1);
+    const restored=Engine.restore(state);restored.history=history;
     restored.status='running';Object.assign(this,restored);return true;
   }
   sweep(){
-    if(this.status!=='running'||!this.bodies.length||this.sweeps<=0)return false;
+    if(this.status!=='running'||!this.bodies.length)return false;
+    this.history.push(this.serialize());
     const tier=Math.min(...this.bodies.map(b=>b.t));
     this.events=this.bodies.filter(b=>b.t===tier).map(b=>({x:b.x,y:b.y,t:b.t,sweep:true,points:0}));
-    this.bodies=this.bodies.filter(b=>b.t!==tier);this.sweeps--;this.danger=0;
-    this.history=[];this._sync();return true;
+    this.bodies=this.bodies.filter(b=>b.t!==tier);this.danger=0;
+    this._sync();return true;
   }
   _sync(){
     const ids=new Set(this.bodies.map(b=>b.id));
@@ -110,7 +111,7 @@ export class Engine {
     }
   }
   serialize(){
-    const keys=['mode','rng','serial','score','elapsed','cooldown','danger','status','current','aim','harvests','combo','lastMerge','undos','sweeps'];
+    const keys=['mode','rng','serial','score','elapsed','cooldown','danger','status','current','aim','harvests','combo','lastMerge'];
     const state={version:2,bodies:this.bodies.map(b=>({...b})),queue:[...this.queue]};
     for(const k of keys)state[k]=this[k];return state;
   }
@@ -121,12 +122,12 @@ export class Engine {
       const tiers=[1,2,4,5,6,7,8,10];
       data.current=tiers[data.current];data.queue=[tiers[data.next],0,1];
       data.bodies=data.bodies?.map(b=>({...b,t:tiers[b.t],y:Math.min(b.y*(FLOOR/607),FLOOR-FRUITS[tiers[b.t]]?.r),omega:0,sleeping:false}));
-      Object.assign(data,{combo:0,lastMerge:-10,undos:3,sweeps:2});
+      Object.assign(data,{combo:0,lastMerge:-10});
     }
     if(!Object.hasOwn(MODES,data.mode)||!['running','paused','over'].includes(data.status)||!Array.isArray(data.bodies)||data.bodies.length>150)throw Error('Invalid save');
     const validTier=t=>Number.isInteger(t)&&t>=0&&t<FRUITS.length;
-    for(const k of['rng','serial','score','elapsed','cooldown','danger','current','aim','harvests','combo','lastMerge','undos','sweeps'])if(!Number.isFinite(data[k]))throw Error('Invalid state');
-    if(data.score<0||data.elapsed<0||!validTier(data.current)||!Array.isArray(data.queue)||data.queue.length!==3||!data.queue.every(validTier)||data.undos<0||data.undos>3||data.sweeps<0||data.sweeps>2)throw Error('Invalid values');
+    for(const k of['rng','serial','score','elapsed','cooldown','danger','current','aim','harvests','combo','lastMerge'])if(!Number.isFinite(data[k]))throw Error('Invalid state');
+    if(data.score<0||data.elapsed<0||!validTier(data.current)||!Array.isArray(data.queue)||data.queue.length!==3||!data.queue.every(validTier))throw Error('Invalid values');
     const ids=new Set();
     for(const b of data.bodies){if(!validTier(b.t)||!['id','x','y','vx','vy','angle','age','delay'].every(k=>Number.isFinite(b[k]))||Math.abs(b.x)>2000||Math.abs(b.y)>5000||ids.has(b.id))throw Error('Invalid fruit');ids.add(b.id);b.omega=Number.isFinite(b.omega)?b.omega:0}
     const e=new Engine(data.mode);for(const k of Object.keys(e.serialize()))if(k!=='version')e[k]=structuredClone(data[k]);

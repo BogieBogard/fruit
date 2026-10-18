@@ -19,7 +19,7 @@
       <button id="new-game" class="round-button" aria-label="New game" title="Restart">↻</button>
     </div>
     <div class="power-bar">
-      <div class="powers"><button id="sweep" class="power-button" aria-label="Sweep smallest fruit" title="Sweep: remove the smallest fruit type"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 3L12 20M11 15l9 5-8 10-10-6zM6 22l8 4M5 26l5 2"/></svg><span id="sweep-count" class="charge">2</span></button><button id="undo" class="power-button" aria-label="Undo last drop" title="Undo last drop (U)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 5L3 13l9 8M4 13h13q12 0 12 13"/></svg><span id="undo-count" class="charge">3</span></button></div>
+      <div class="powers"><button id="sweep" class="power-button" aria-label="Sweep smallest fruit, unlimited uses" title="Sweep: unlimited uses"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 3L12 20M11 15l9 5-8 10-10-6zM6 22l8 4M5 26l5 2"/></svg><span id="sweep-count" class="charge">∞</span></button><button id="undo" class="power-button" aria-label="Undo last action, unlimited uses" title="Undo last action (U), unlimited uses"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 5L3 13l9 8M4 13h13q12 0 12 13"/></svg><span id="undo-count" class="charge">∞</span></button></div>
       <div class="next-box"><span>NEXT</span><canvas id="next" width="240" height="85" aria-label="Next three fruit"></canvas></div>
     </div>
     <div class="board-wrap">
@@ -32,7 +32,7 @@
   </section>
   <aside class="guide"><span class="tag">THE BIGGER, THE BETTER</span><h2>ONE MORE<br><span>MERGE.</span></h2><p>A little bounce. A perfect match.<br>And suddenly, a much bigger fruit.</p><div class="guide-card"><h3>THE RULES ARE SIMPLE</h3><p><b>01</b> Move to aim. Release to drop.</p><p><b>02</b> Two matching fruit become one.</p><p><b>03</b> Don’t cross the danger line.</p></div><div class="guide-card"><h3>MEET THE WHOLE BUNCH</h3><div id="ladder" class="ladder"></div></div><p class="controls">← → AIM &nbsp; SPACE DROP<br>P PAUSE &nbsp; U UNDO &nbsp; M SOUND</p><p class="privacy">Your game saves in this browser.<br>No ads. No account. Just fruit.</p></aside>
 </main>
-<dialog id="help"><button id="close-help" class="close" aria-label="Close instructions">×</button><h2>HOW TO PLAY</h2><p>Slide your finger or move your mouse to aim. Release or click to drop.</p><p>Matching fruit merge into the next fruit in the row. Keep the pile below the dotted line. Two jackfruits make a harvest worth 1,000 bonus points!</p><p><b>↶ Undo</b> rewinds your last drop (3 per game).<br><b>✦ Sweep</b> clears the smallest fruit type (2 per game).</p><p>Your board and best scores save automatically in this browser. Come back anytime to continue.</p><button id="help-ok" class="primary">GOT IT!</button></dialog>
+<dialog id="help"><button id="close-help" class="close" aria-label="Close instructions">×</button><h2>HOW TO PLAY</h2><p>Slide your finger or move your mouse to aim. Release or click to drop.</p><p>Matching fruit merge into the next fruit in the row. Keep the pile below the dotted line. Two jackfruits make a harvest worth 1,000 bonus points!</p><p><b>↶ Undo</b> steps back through drops and sweeps in this session, even after game over. Unlimited uses.<br><b>✦ Sweep</b> clears the smallest fruit type. Unlimited uses.</p><p>Your board and best scores save automatically in this browser. Undo history lasts until you close or reload the page.</p><button id="help-ok" class="primary">GOT IT!</button></dialog>
 <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
-<script type="module" src="./game.js?v=2"></script>
+<script type="module" src="./game.js?v=3"></script>
 </body></html>

@@ -1,4 +1,4 @@
-import{FRUITS}from'./engine.js?v=2';
+import{FRUITS}from'./engine.js?v=3';
 
 // Every fruit has a full circular silhouette matching its physical radius.
 // Details and leaves never replace, shrink, or inset the contact silhouette.

@@ -1,5 +1,5 @@
-import{Engine,FRUITS,MODES,W,H,LINE,FLOOR,WALL}from'./engine.js?v=2';
-import{fruit}from'./art.js?v=2';
+import{Engine,FRUITS,MODES,W,H,LINE,FLOOR,WALL}from'./engine.js?v=3';
+import{fruit}from'./art.js?v=3';
 const $=s=>document.querySelector(s),board=$('#board'),ctx=board.getContext('2d'),next=$('#next').getContext('2d');
 const ratio=Math.min(devicePixelRatio||1,2);board.width=W*ratio;board.height=H*ratio;ctx.scale(ratio,ratio);
 const KEY='mbogard.fruit.orchard.v1';
@@ -22,15 +22,15 @@ function soundUI(){$('#sound').setAttribute('aria-pressed',sound);$('#sound').se
 function toggleSound(){sound=!sound;soundUI();save();if(sound)tone(2)}
 function sync(force=false){
   const mode=engine?.mode||selected,time=Math.floor(engine?.elapsed||0);
-  const stamp=[mode,engine?.score,settings.best[mode],time,engine?.current,engine?.queue.join(','),engine?.status,engine?.undos,engine?.sweeps,engine?.history.length].join('|');
+  const stamp=[mode,engine?.score,settings.best[mode],time,engine?.current,engine?.queue.join(','),engine?.status,engine?.history.length].join('|');
   if(!force&&stamp===uiStamp)return;uiStamp=stamp;
   $('#mode-label').textContent=MODES[mode].name.toUpperCase();$('#score').textContent=(engine?.score||0).toLocaleString();$('#best').textContent=(settings.best[mode]||0).toLocaleString();$('#time').textContent=`${Math.floor(time/60)}:${String(time%60).padStart(2,'0')}`;
   next.clearRect(0,0,240,85);for(let i=0;i<3;i++)fruit(next,engine?.queue[i]??[1,2,4][i],40+i*80,47,i===0?27:23,0,i===0?1:.65);
   $('#next').setAttribute('aria-label',`Next fruit: ${FRUITS[engine?.next??1].name}`);
   $('#pause').disabled=!engine||engine.status==='over';$('#pause').textContent=engine?.status==='paused'?'▶':'Ⅱ';$('#pause').setAttribute('aria-label',engine?.status==='paused'?'Resume game':'Pause game');
-  $('#undo-count').textContent=engine?.undos??3;$('#sweep-count').textContent=engine?.sweeps??2;
-  $('#undo').disabled=!engine||!engine.history.length||engine.undos<=0||!$('#overlay').hidden;
-  $('#sweep').disabled=!engine||!engine.bodies.length||engine.sweeps<=0||engine.status!=='running';
+  $('#undo-count').textContent='∞';$('#sweep-count').textContent='∞';
+  $('#undo').disabled=!engine||!engine.history.length;
+  $('#sweep').disabled=!engine||!engine.bodies.length||engine.status!=='running';
   for(const c of document.querySelectorAll('#evolution canvas'))c.classList.toggle('current',Number(c.dataset.tier)===engine?.current);
 }
 function overlay(type){
@@ -51,7 +51,7 @@ function play(){
 }
 function pause(){if(!engine||engine.status==='over')return;if(engine.status==='running'){engine.status='paused';overlay('paused');save()}else play()}
 function drop(){if(engine?.drop()){tone(0,true);save();sync(true)}}
-function undo(){if(engine?.undo()){particles=[];bursts=[];rings=[];save();sync(true);board.focus({preventScroll:true});announce('Last drop undone.')}}
+function undo(){if(engine?.undo()){particles=[];bursts=[];rings=[];$('#overlay').hidden=true;last=0;acc=0;save();sync(true);board.focus({preventScroll:true});announce('Last action undone.')}}
 function sweep(){if(engine?.sweep()){for(const e of engine.events)effects(e);save();sync(true);board.focus({preventScroll:true});announce('Smallest fruit cleared.')}}
 function announce(text){$('#announcement').textContent=text}
 for(const button of document.querySelectorAll('[data-mode]'))button.addEventListener('click',()=>{selected=button.dataset.mode;for(const b of document.querySelectorAll('[data-mode]')){b.classList.toggle('selected',b===button);b.setAttribute('aria-pressed',String(b===button))}$('#mode-description').textContent=MODES[selected].description;$('#mode-label').textContent=MODES[selected].name.toUpperCase();$('#best').textContent=(settings.best[selected]||0).toLocaleString()});

@@ -10,8 +10,8 @@ try{
  for(let i=0;i<24;i++){await page.mouse.click(board.x+board.width*(.25+(i%3)*.25),board.y+board.height*.5);await page.waitForTimeout(450)}
  await page.waitForTimeout(3000);assert.ok(Number((await page.locator('#score').innerText()).replaceAll(',',''))>0);
  await page.screenshot({path:'test-results/desktop-gameplay.png',fullPage:true});
- await page.locator('#undo').click();assert.equal(await page.locator('#undo-count').innerText(),'2');
- await page.locator('#sweep').click();assert.equal(await page.locator('#sweep-count').innerText(),'1');
+ await page.locator('#undo').click();assert.equal(await page.locator('#undo-count').innerText(),'∞');
+ await page.locator('#sweep').click();assert.equal(await page.locator('#sweep-count').innerText(),'∞');
  await page.locator('#help-button').click();await page.locator('#help').waitFor();await page.locator('#help-ok').click();await page.locator('#help').waitFor({state:'hidden'});
  const contactPixels=await page.evaluate(async()=>{
    const{fruit}=await import('/fruit/art.js?v=2');const samples=[];

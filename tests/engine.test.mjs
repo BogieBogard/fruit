@@ -53,13 +53,24 @@ test('off-center fruit roll off a larger round fruit',()=>{
   const e=new Engine();e.bodies=[e.body(9,210,FLOOR-FRUITS[9].r),e.body(3,230,FLOOR-FRUITS[9].r*2-FRUITS[3].r)];
   const top=e.bodies[1];tick(e,4);assert.ok(Math.abs(top.x-230)>35,`Only moved ${top.x-230}`);assert.ok(Math.abs(top.angle)>.2);
 });
-test('undo restores the last drop and consumes a charge without RNG exploits',()=>{
+test('undo restores the last drop including its RNG state',()=>{
   const e=new Engine('classic',321);const before=e.serialize();e.drop();tick(e,1);assert.ok(e.undo());
-  const after=e.serialize();assert.equal(after.undos,2);assert.deepEqual(after.bodies,before.bodies);assert.equal(after.rng,before.rng);assert.equal(after.current,before.current);assert.deepEqual(after.queue,before.queue);
+  const after=e.serialize();assert.deepEqual(after.bodies,before.bodies);assert.equal(after.rng,before.rng);assert.equal(after.current,before.current);assert.deepEqual(after.queue,before.queue);
 });
-test('sweep clears the smallest tier only and consumes a charge',()=>{
+test('sweep clears the smallest tier only and can itself be undone',()=>{
   const e=new Engine();e.bodies=[e.body(1,60,400),e.body(4,200,400),e.body(1,340,400)];
-  assert.ok(e.sweep());assert.deepEqual(e.bodies.map(b=>b.t),[4]);assert.equal(e.sweeps,1);assert.equal(e.score,0);
+  const before=e.serialize();assert.ok(e.sweep());assert.deepEqual(e.bodies.map(b=>b.t),[4]);assert.equal(e.score,0);assert.ok(e.undo());assert.deepEqual(e.serialize(),before);
+});
+test('more than three drops can be undone, including after game over',()=>{
+  const e=new Engine('cozy',712);const first=e.serialize();
+  for(let i=0;i<12;i++){e.setAim(50+i*20);assert.ok(e.drop());tick(e,.4)}
+  e.status='over';assert.ok(e.undo());assert.equal(e.status,'running');
+  for(let i=0;i<11;i++)assert.ok(e.undo());assert.equal(e.bodies.length,0);assert.equal(e.score,first.score);assert.equal(e.undo(),false);
+});
+test('sweeps work indefinitely and ignore exhausted limits from older saves',()=>{
+  const old=new Engine().serialize();old.undos=0;old.sweeps=0;const e=Engine.restore(old);
+  for(let i=0;i<20;i++){e.bodies.push(e.body(i%FRUITS.length,210,400));assert.ok(e.sweep());assert.equal(e.bodies.length,0)}
+  assert.equal(e.history.length,20);for(let i=0;i<20;i++)assert.ok(e.undo());
 });
 test('cooldown and pause prevent unintended drops',()=>{
   const e=new Engine();assert.ok(e.drop());assert.equal(e.drop(),false);e.status='paused';

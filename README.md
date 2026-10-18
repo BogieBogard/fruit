@@ -21,7 +21,7 @@ Open http://127.0.0.1:4173/fruit/. Run `npm test` for physics, scoring, save/res
 - Easy, Classic, and Hard modes with separate personal bests.
 - Eleven fruits with full circular artwork matching their collision surfaces; real rolling, friction, bounce, stable stacking, and sleeping resting bodies.
 - Three-fruit upcoming preview, evolution strip, merge particles, score bursts, and chain-merge feedback.
-- Undo the last drop (3 charges per game) or sweep the smallest fruit type (2 charges).
+- Unlimited undo through drops and sweeps in the current session, including recovery after game over. Unlimited sweeps of the smallest fruit type.
 - Automatic saves, pause when the tab is hidden, and explicit resume when returning.
 - Optional synthesized sound; muted by default. Respects reduced-motion preferences.
 - Responsive phone, tablet, and desktop layouts; high-density canvas rendering.
@@ -29,7 +29,7 @@ Open http://127.0.0.1:4173/fruit/. Run `npm test` for physics, scoring, save/res
 
 ## Browser saves
 
-The versioned `mbogard.fruit.orchard.v1` localStorage entry holds the current board, fruit velocities and rotation, upcoming queue, random generator state, score, elapsed time, mode, remaining power-up charges, and settings. Its payload is now version 2; original eight-fruit saves migrate automatically, preserving the board and score. Runs save after drops, on pause/tab exit, and about once a second during play. Returning opens the saved run paused. Undo history is session-only; unused charges persist. Saves are local to the browser/profile and origin; they do not sync across devices. Clearing site data removes them. Private browsing or blocked storage can prevent persistent saving; gameplay still works.
+The versioned `mbogard.fruit.orchard.v1` localStorage entry holds the current board, fruit velocities and rotation, upcoming queue, random generator state, score, elapsed time, mode, and settings. Its payload is version 2; original eight-fruit saves migrate automatically, preserving the board and score. Old charge limits are ignored. Runs save after drops, on pause/tab exit, and about once a second during play. Returning opens the saved run paused. Undo history is session-only and resets when the page is closed or reloaded. Saves are local to the browser/profile and origin; they do not sync across devices. Clearing site data removes them. Private browsing or blocked storage can prevent persistent saving; gameplay still works.
 
 ## GitHub Pages
 
