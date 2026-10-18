@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3e9">
+  <meta name="description" content="A little room to grow. Drop, bounce, and merge your way from cherries to jackfruit in Orchard Drop, a free browser puzzle game.">
+  <title>Orchard Drop · A little room to grow</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="site-header"><a class="wordmark" href="./" aria-label="Orchard Drop home"><span class="brand-icon">✳</span> orchard<span>drop</span><small>A LITTLE ROOM TO GROW</small></a><a class="portfolio" href="https://mbogard.com">A little game by Matt <span>↗</span></a></header>
+<main>
+  <aside class="intro"><div class="eyebrow"><span></span> THE SLOW-DOWN ARCADE</div><h1>Good things<br>grow <em>together.</em></h1><p>One small fruit. A little gravity.<br>A very satisfying chain reaction.</p><div class="instructions"><span class="step">01</span><div><strong>Find your spot.</strong><p>Move your mouse or slide your finger.</p></div><span class="step">02</span><div><strong>Let it drop.</strong><p>Click or release to send your fruit down.</p></div><span class="step">03</span><div><strong>Grow something bigger.</strong><p>Matching fruit merge. Reach the jackfruit.</p></div></div><div class="save-note"><span>◈</span><p>Your orchard stays here.<br><small>Progress saves in this browser.</small></p></div></aside>
+  <section class="game" aria-label="Orchard Drop game">
+    <div class="game-heading"><div><span class="eyebrow">YOUR ORCHARD</span><h2 id="mode-label">Classic</h2></div><div class="tools"><button id="sound" class="icon-button" aria-label="Turn sound on" aria-pressed="false" title="Sound">♪<span class="off-slash">/</span></button><button id="pause" class="icon-button" aria-label="Pause game" title="Pause (P)">Ⅱ</button></div></div>
+    <div class="scoreboard"><div><span>SCORE</span><strong id="score">0</strong></div><div class="best"><span>PERSONAL BEST <span class="star">✧</span></span><strong id="best">0</strong></div><div class="next"><span>NEXT UP</span><canvas id="next" width="100" height="100" aria-label="Next fruit"></canvas></div></div>
+    <div class="board-wrap"><canvas id="board" width="420" height="620" tabindex="0" aria-label="Fruit game board. Use left and right arrows to aim, space to drop, and P to pause."></canvas><div class="board-caption"><span id="board-hint">KEEP IT BELOW THE LINE</span><span id="time">0:00</span></div><div id="overlay" class="overlay"><div class="overlay-content"><div class="seed-mark">✳</div><span class="eyebrow" id="overlay-kicker">A FRESH LITTLE START</span><h2 id="overlay-title">Make room<br>for good things.</h2><p id="overlay-text">Drop fruit. Find a match.<br>See how far your orchard can grow.</p><div id="mode-picker" class="mode-picker" aria-label="Difficulty"><button data-mode="cozy">Cozy</button><button data-mode="classic" class="selected">Classic</button><button data-mode="spicy">Spicy</button></div><p id="mode-description" class="mode-description">A balanced bounce. The sweet spot.</p><button id="play" class="primary">Plant the first seed <span>↗</span></button><button id="restart" class="text-button" hidden>Start a fresh orchard</button></div></div></div>
+    <div class="game-footer"><span><i class="status-dot"></i> <span id="save-status">Saved on this device</span></span><button id="new-game">New orchard ↻</button></div>
+    <p class="mobile-guide">Slide to aim · Release to drop · Match two to grow</p>
+  </section>
+  <aside class="field-notes"><span class="eyebrow">FROM SMALL BEGINNINGS</span><h2>The fruit family.</h2><p>A match makes the next one.<br>There’s always room to grow.</p><div id="ladder" class="ladder"></div><div class="tip"><span>FIELD NOTE NO. 01</span><p>Leave a little room on either side. A good bounce can change everything.</p></div><div class="keyboard">← → aim <span>SPACE drop</span><br>P pause <span>M sound</span></div></aside>
+</main>
+<footer class="site-footer"><span>NO RUSH. JUST FRUIT.</span><span>Made for the joy of a good little game. <span class="flower">✳</span></span></footer>
+<div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+<script type="module" src="./game.js"></script>
+</body></html>
