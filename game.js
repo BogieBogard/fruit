@@ -1,5 +1,5 @@
-import{Engine,FRUITS,MODES,W,H,LINE,WALL}from'./engine.js?v=4';
-import{fruit}from'./art.js?v=3';
+import{Engine,FRUITS,MODES,W,H,LINE,WALL}from'./engine.js?v=5';
+import{fruit}from'./art.js?v=5';
 const $=s=>document.querySelector(s),board=$('#board'),ctx=board.getContext('2d'),next=$('#next').getContext('2d');
 let worldHeight=H,worldWidth=W;
 function fitBoard(){
@@ -87,7 +87,7 @@ function effects(e){
   tone(e.t);if(!e.sweep)bursts.push({...e,life:1});
   if(!reduced){rings.push({x:e.x,y:e.y,r:FRUITS[e.t].r,life:.35,color:FRUITS[e.t].light});for(let i=0;i<16;i++){const a=Math.random()*Math.PI*2,speed=45+Math.random()*110;particles.push({x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-20,life:.6,t:e.t,r:2+Math.random()*4})}}
   if(e.combo>=3&&!reduced){$('.game').classList.remove('shake');void $('.game').offsetWidth;$('.game').classList.add('shake')}
-  announce(e.harvest?'Jackfruit harvest! A thousand bonus points.':e.sweep?'Fruit swept away.':`${FRUITS[e.t].name} merged. ${engine.score} points.`);
+  announce(e.harvest?'Watermelon harvest! A thousand bonus points.':e.sweep?'Fruit swept away.':`${FRUITS[e.t].name} merged. ${engine.score} points.`);
 }
 function render(dt){
   const W=worldWidth,H=worldHeight,FLOOR=engine?.floor??H-12;
@@ -119,5 +119,5 @@ for(let t=0;t<FRUITS.length;t++){
   const c=document.createElement('canvas');c.width=100;c.height=100;c.dataset.tier=t;c.title=FRUITS[t].name;c.setAttribute('role','img');c.setAttribute('aria-label',FRUITS[t].name);fruit(c.getContext('2d'),t,50,55,34);$('#evolution').append(c);
   const row=document.createElement('div');row.className='fruit-row';const copy=c.cloneNode();fruit(copy.getContext('2d'),t,50,55,34);const label=document.createElement('span');label.textContent=FRUITS[t].name;row.append(copy,label);$('#ladder').append(row);
 }
-const hero=$('#hero').getContext('2d');fruit(hero,4,155,132,65,-.2);fruit(hero,9,310,115,88,.08);fruit(hero,5,466,132,65,.2);
+const hero=$('#hero').getContext('2d');fruit(hero,4,155,132,65,-.2);fruit(hero,10,310,115,88,.08);fruit(hero,5,466,132,65,.2);
 soundUI();overlay(engine?(engine.status==='over'?'over':'paused'):'new');if(!storage)$('#save-status').textContent='SAVING UNAVAILABLE';sync(true);fitBoard();new ResizeObserver(fitBoard).observe($('.board-wrap'));window.visualViewport?.addEventListener('resize',fitBoard);window.addEventListener('resize',fitBoard);requestAnimationFrame(frame);

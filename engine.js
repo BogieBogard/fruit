@@ -11,8 +11,8 @@ export const FRUITS = [
   {name:'Peach', r:53, color:'#f5839d', light:'#ffc0b7', edge:'#be4b7d', points:36},
   {name:'Pineapple', r:64, color:'#f4c82e', light:'#ffe76b', edge:'#b47b13', points:45},
   {name:'Dragon fruit', r:76, color:'#ec68b2', light:'#ffacd5', edge:'#ad367e', points:55},
-  {name:'Watermelon', r:90, color:'#43bd24', light:'#8fe438', edge:'#1c771b', points:66},
-  {name:'Jackfruit', r:106, color:'#b4cb2b', light:'#e3ed5b', edge:'#6d921b', points:78},
+  {name:'Jackfruit', r:90, color:'#b4cb2b', light:'#e3ed5b', edge:'#6d921b', points:66},
+  {name:'Watermelon', r:106, color:'#43bd24', light:'#8fe438', edge:'#1c771b', points:78},
 ];
 export const MODES = {
   cozy:{name:'Easy', gravity:880, grace:3.5, max:3, description:'A little more time above the line.'},

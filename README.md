@@ -1,6 +1,6 @@
 # Orchard Drop
 
-A bright, arcade-style fruit-merging game for the browser. Move to aim, click or release to drop, and merge matching fruit through eleven stages from blueberry to jackfruit. Merge two jackfruits to harvest the pair and earn a 1,000-point bonus.
+A bright, arcade-style fruit-merging game for the browser. Move to aim, click or release to drop, and merge matching fruit through eleven stages from blueberry to watermelon. Jackfruit is the second-largest fruit. Merge two watermelons to harvest the pair and earn a 1,000-point bonus. Existing saves keep their tier progress, sizes, and scores.
 
 Intended Pages URL: **https://mbogard.com/fruit/**
 

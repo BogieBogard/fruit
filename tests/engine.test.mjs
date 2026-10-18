@@ -16,7 +16,8 @@ test('different fruit collide without merging',()=>{
   const e=new Engine();e.bodies=[e.body(0,200,400),e.body(1,220,400)];e.step(.01);
   assert.equal(e.bodies.length,2);assert.equal(e.score,0);
 });
-test('two jackfruits harvest and clear',()=>{
+test('watermelon is the largest final fruit; two watermelons harvest and clear',()=>{
+  assert.equal(FRUITS.at(-1).name,'Watermelon');assert.ok(FRUITS.slice(0,-1).every(f=>f.r<FRUITS.at(-1).r));
   const e=new Engine();e.bodies=[e.body(10,110,400),e.body(10,310,400)];
   e.bodies.forEach(b=>b.delay=0);e.step(.01);
   assert.equal(e.bodies.length,0);assert.equal(e.harvests,1);assert.equal(e.score,1078);
